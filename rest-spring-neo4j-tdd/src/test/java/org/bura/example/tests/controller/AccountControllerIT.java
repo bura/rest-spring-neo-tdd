@@ -1,5 +1,13 @@
 package org.bura.example.tests.controller;
 
+import java.net.URISyntaxException;
+
+import javax.servlet.ServletException;
+
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.StandardServer;
+import org.apache.catalina.startup.Tomcat;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -12,7 +20,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
-public class AccountControllerTest {
+public class AccountControllerIT {
 
 	@Test
 	public void testCreateAccount() {
@@ -33,15 +41,33 @@ public class AccountControllerTest {
 	public void testRemoveAccount() {
 		Assert.fail("Not implemented");
 	}
-	
-	@BeforeClass
-	public static void init() {
 
+	private static Tomcat tomcat;
+	
+	private static String contextPath = "/test";
+	
+	private static int port = 8080;
+
+	@BeforeClass
+	public static void init() throws ServletException, URISyntaxException,
+			LifecycleException {
+		
+		tomcat = new Tomcat();
+		tomcat.setPort(port);
+
+		tomcat.setBaseDir("/target");
+
+		StandardServer server = (StandardServer) tomcat.getServer();
+		AprLifecycleListener listener = new AprLifecycleListener();
+		server.addLifecycleListener(listener);
+		
+		tomcat.addWebapp(contextPath, "rest-spring-neo4j-tdd.war");
+		tomcat.start();
 	}
 
 	@AfterClass
-	public static void destroy() {
-
+	public static void destroy() throws LifecycleException {
+		tomcat.stop();
 	}
 
 	@Configuration
