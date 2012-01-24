@@ -43,25 +43,22 @@ public class AccountControllerIT {
 	}
 
 	private static Tomcat tomcat;
-	
-	private static String contextPath = "/test";
-	
+
 	private static int port = 8080;
 
 	@BeforeClass
 	public static void init() throws ServletException, URISyntaxException,
 			LifecycleException {
-		
+
 		tomcat = new Tomcat();
 		tomcat.setPort(port);
-
-		tomcat.setBaseDir("/target");
+		tomcat.setBaseDir("target");
 
 		StandardServer server = (StandardServer) tomcat.getServer();
 		AprLifecycleListener listener = new AprLifecycleListener();
 		server.addLifecycleListener(listener);
-		
-		tomcat.addWebapp(contextPath, "rest-spring-neo4j-tdd.war");
+
+		tomcat.addWebapp("/", "rest-spring-neo4j-tdd");
 		tomcat.start();
 	}
 
