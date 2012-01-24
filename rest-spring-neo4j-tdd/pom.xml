@@ -7,14 +7,52 @@
 	<artifactId>rest-spring-neo4j-tdd</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
+	<name>${project.artifactId}</name>
 
 	<properties>
 		<java.version>1.6</java.version>
 		<org.springframework.version>3.1.0.RELEASE</org.springframework.version>
-		<org.springframework.security.version>3.1.0.RELEASE</org.springframework.security.version>
-		<org.slf4j.version>1.6.4</org.slf4j.version>
-		<cglib.version>2.2.2</cglib.version>
 	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>2.2.2</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-web-api</artifactId>
+			<version>6.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>1.9.3</version>
+			<scope>runtime</scope>
+		</dependency>
+	
+		<!-- TEST -->
+		<dependency>  
+            <groupId>org.springframework</groupId>  
+            <artifactId>spring-test</artifactId>  
+            <version>${org.springframework.version}</version>  
+            <scope>test</scope>  
+        </dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<plugins>
