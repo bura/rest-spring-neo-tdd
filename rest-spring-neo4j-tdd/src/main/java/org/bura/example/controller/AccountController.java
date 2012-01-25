@@ -5,12 +5,14 @@ import java.util.List;
 import org.bura.example.dao.AccountDao;
 import org.bura.example.dto.Account;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @RequestMapping(value = "account")
@@ -20,6 +22,7 @@ public class AccountController {
 	private AccountDao dao;
 
 	@RequestMapping(value = "create", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+	@ResponseStatus(HttpStatus.CREATED)
 	@ResponseBody
 	public long createAccount(@RequestBody Account account) {
 		dao.createAccount(account);
@@ -40,6 +43,7 @@ public class AccountController {
 	}
 
 	@RequestMapping(value = "remove/{id}", method = RequestMethod.POST)
+	@ResponseStatus(HttpStatus.OK)
 	public void removeAccount(@PathVariable("id") long id) {
 		dao.remove(id);
 	}
