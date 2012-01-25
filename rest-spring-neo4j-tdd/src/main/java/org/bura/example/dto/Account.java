@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class Account {
 
-	private String id;
+	private long id;
 
 	private String number;
 
@@ -19,11 +19,11 @@ public class Account {
 		this.balance = balance;
 	}
 
-	public String getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
