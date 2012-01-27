@@ -1,36 +1,38 @@
 package org.bura.example.dao;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.bura.example.dto.Account;
+import org.neo4j.helpers.collection.ClosableIterable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class AccountDao {
 
-	private List<Account> accounts = new ArrayList<Account>();
+	@Autowired
+	private Neo4jTemplate neo4j;
 
-	private long nextId = 1;
+	private GraphRepository<Account> repo;
 
-	public AccountDao() {
-		Account acc = new Account("1111", new BigDecimal(0));
-		acc.setId(nextId++);
-		accounts.add(acc);
-		acc = new Account("2222", new BigDecimal(100));
-		acc.setId(nextId++);
-		accounts.add(acc);
+	@PostConstruct
+	void init() {
+		repo = neo4j.repositoryFor(Account.class);
 	}
 
-	public void remove(long id) {
+	public void remove(Long id) {
 		Account acc = findById(id);
 		if (acc == null) {
 			throw new IllegalArgumentException();
 		}
 
-		accounts.remove(acc);
+		repo.delete(acc);
 	}
 
 	public void createAccount(Account account) {
@@ -38,27 +40,35 @@ public class AccountDao {
 			throw new IllegalArgumentException();
 		}
 
-		long id = nextId++;
-		account.setId(id);
-		accounts.add(account);
+		Account acc = repo.save(account);
+		account.setId(acc.getId());
 	}
 
 	public List<Account> getAccounts() {
-		return Collections.unmodifiableList(accounts);
+		ClosableIterable<Account> itHolder = repo.findAll();
+		try {
+			List<Account> accs = new ArrayList<Account>();
+			Iterator<Account> iter = itHolder.iterator();
+			while (iter.hasNext()) {
+				accs.add(iter.next());
+			}
+
+			return accs;
+		} finally {
+			itHolder.close();
+		}
 	}
 
-	public Account getAccount(long id) {
+	public Account getAccount(Long id) {
 		return findById(id);
 	}
 
-	private Account findById(long id) {
-		for (Account acc : accounts) {
-			if (id == acc.getId()) {
-				return acc;
-			}
+	private Account findById(Long id) {
+		if (id == null || id < 1) {
+			return null;
 		}
 
-		return null;
+		return repo.findOne(id);
 	}
 
 }

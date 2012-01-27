@@ -33,6 +33,23 @@ import org.springframework.web.client.RestTemplate;
 public class AccountControllerIT {
 
 	@Test
+	public void testCreateAccount() {
+		Account acc = new Account("321", "test test", new BigDecimal(1000));
+		Long id = rest.postForObject(BASE_URL + "/create", acc, Long.class);
+
+		Assert.assertTrue(id > 0);
+
+		ResponseEntity<Account> response = rest.getForEntity(
+				BASE_URL + "/{id}", Account.class, id);
+		Account nacc = response.getBody();
+		Assert.assertNotNull(nacc);
+		Assert.assertEquals(id, nacc.getId());
+		Assert.assertEquals(acc.getNumber(), nacc.getNumber());
+		Assert.assertEquals(acc.getOwner(), nacc.getOwner());
+		Assert.assertEquals(acc.getBalance(), nacc.getBalance());
+	}
+
+	@Test
 	public void testGetAccounts() {
 		ResponseEntity<Account[]> response = rest.getForEntity(BASE_URL,
 				Account[].class);
@@ -47,23 +64,7 @@ public class AccountControllerIT {
 		Account account = response.getBody();
 
 		Assert.assertNotNull(account);
-		Assert.assertEquals(1L, account.getId());
-	}
-
-	@Test
-	public void testCreateAccount() {
-		Account acc = new Account("321", new BigDecimal(1000));
-		long id = rest.postForObject(BASE_URL + "/create", acc, long.class);
-
-		Assert.assertTrue(id > 0);
-
-		ResponseEntity<Account> response = rest.getForEntity(
-				BASE_URL + "/{id}", Account.class, id);
-		Account nacc = response.getBody();
-		Assert.assertNotNull(nacc);
-		Assert.assertEquals(id, nacc.getId());
-		Assert.assertEquals(acc.getNumber(), nacc.getNumber());
-		Assert.assertEquals(acc.getBalance(), nacc.getBalance());
+		Assert.assertEquals(Long.valueOf(1L), account.getId());
 	}
 
 	@Test
