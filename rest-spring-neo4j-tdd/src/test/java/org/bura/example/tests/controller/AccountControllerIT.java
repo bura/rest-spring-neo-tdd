@@ -11,7 +11,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
-import org.bura.example.dto.Account;
+import org.bura.example.app.domain.dto.Account;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;

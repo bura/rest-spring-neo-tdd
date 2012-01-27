@@ -1,4 +1,4 @@
-package org.bura.example.dto;
+package org.bura.example.app.domain.dto;
 
 import java.math.BigDecimal;
 

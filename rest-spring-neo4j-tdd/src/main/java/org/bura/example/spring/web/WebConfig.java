@@ -6,7 +6,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "org.bura.example.controller")
+@ComponentScan(basePackages = "org.bura.example.web.controller")
 public class WebConfig {
 
 	public WebConfig() {

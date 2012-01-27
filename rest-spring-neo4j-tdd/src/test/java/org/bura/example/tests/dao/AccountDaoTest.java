@@ -5,13 +5,15 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.bura.example.dao.AccountDao;
-import org.bura.example.dto.Account;
-import org.bura.example.spring.app.AppConfig;
+import org.bura.example.app.domain.dto.Account;
+import org.bura.example.app.service.AccountService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.neo4j.graphdb.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.data.neo4j.repository.GraphRepository;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,20 +22,14 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = AppConfig.class)
+@ContextConfiguration(loader = AnnotationConfigContextLoader.class)
 public class AccountDaoTest {
-
-	@Autowired
-	private AccountDao accountDao;
-
-	@Autowired
-	private Neo4jTemplate neo4j;
 
 	@Test
 	@Transactional
 	public void testCreateAccount() {
 		Account acc = new Account("4321", "toto toto", new BigDecimal(10000));
-		accountDao.createAccount(acc);
+		accountService.create(acc);
 
 		Assert.assertTrue(acc.getId() > 0L);
 		GraphRepository<Account> repo = getAccountRepo();
@@ -44,7 +40,7 @@ public class AccountDaoTest {
 		Assert.assertEquals(nacc.getBalance(), acc.getBalance());
 
 		try {
-			accountDao.createAccount(null);
+			accountService.create(null);
 			Assert.fail();
 		} catch (IllegalArgumentException e) {
 		}
@@ -57,7 +53,7 @@ public class AccountDaoTest {
 		repo.save(new Account());
 		repo.save(new Account());
 
-		List<Account> accs = accountDao.getAccounts();
+		List<Account> accs = accountService.getAll();
 		Assert.assertNotNull(accs);
 		Assert.assertTrue(accs.size() == 2);
 		for (Account acc : accs) {
@@ -72,7 +68,7 @@ public class AccountDaoTest {
 		Account tacc = new Account("111", "Иванов И.И.", new BigDecimal(1000));
 		tacc = repo.save(tacc);
 
-		Account acc = accountDao.getAccount(tacc.getId());
+		Account acc = accountService.get(tacc.getId());
 
 		Assert.assertNotNull(acc);
 		Assert.assertEquals(tacc.getId(), acc.getId());
@@ -80,7 +76,7 @@ public class AccountDaoTest {
 		Assert.assertEquals(tacc.getOwner(), acc.getOwner());
 		Assert.assertEquals(tacc.getBalance(), acc.getBalance());
 
-		acc = accountDao.getAccount(-1L);
+		acc = accountService.get(-1L);
 		Assert.assertNull(acc);
 	}
 
@@ -98,7 +94,7 @@ public class AccountDaoTest {
 
 		tr = neo4j.beginTx();
 		try {
-			accountDao.remove(tacc.getId());
+			accountService.remove(tacc.getId());
 			tr.success();
 		} finally {
 			tr.finish();
@@ -106,16 +102,27 @@ public class AccountDaoTest {
 
 		Account acc = repo.findOne(tacc.getId());
 		Assert.assertNull(acc);
-
-		try {
-			accountDao.remove(-1L);
-			Assert.fail();
-		} catch (IllegalArgumentException e) {
-		}
 	}
+
+	@Autowired
+	private AccountService accountService;
+
+	@Autowired
+	private Neo4jTemplate neo4j;
 
 	private GraphRepository<Account> getAccountRepo() {
 		return neo4j.repositoryFor(Account.class);
+	}
+
+	@Configuration
+	@ImportResource("classpath:/spring/test-neo4j.xml")
+	@ComponentScan(basePackages = "org.bura.example.app")
+	static class ContextConfiguration {
+
+		public ContextConfiguration() {
+			super();
+		}
+
 	}
 
 }
